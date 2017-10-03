@@ -7,6 +7,7 @@ class state:
     opcode = []
     validInstr = []
     address = []
+    arg0 = []
     arg1 = []
     arg2 = []
     arg3 = []
@@ -16,25 +17,29 @@ class state:
     # inputFileName = ''
     # outputFileName = ''
     
-    def __init__( self, instrs, opcodes, valids, addrs, args1, args2, args3 ):
+    def __init__( self, instrs, opcodes, valids, args0, args1, args2, args3 ):
         self.instruction.append(instrs)
         self.opcode.append(opcodes)
         self.validInstr.append(valids)
-        self.address.append(addrs)
+        self.arg0.append(args0)
         self.numInstructions += 1
         self.arg1.append(args1)
         self.arg2.append(args2)
         self.arg3.append(args3)
+        self.address.append(self.PC)
+        self.PC += 4
      
-    def addInstruction( self, instrs, opcodes, valids, addrs, args1, args2, args3 ):
+    def addInstruction( self, instrs, opcodes, valids, args0, args1, args2, args3 ):
         self.instruction.append(instrs)
         self.opcode.append(opcodes)
         self.validInstr.append(valids)
-        self.address.append(addrs)
+        self.arg0.append(args0)
         self.numInstructions += 1
         self.arg1.append(args1)
         self.arg2.append(args2)
         self.arg3.append(args3)
+        self.address.append(self.PC)
+        self.PC += 4
         
     def disassembler( self,  dfile, sfile):
         rs = 0
@@ -44,8 +49,8 @@ class state:
         for i in range(self.numInstructions):
 
             dfile.write(self.validInstr[i] + ' ' + self.opcode[i] + ' ' 
-                + self.address[i] + ' ' + self.arg1[i] + ' ' + self.arg2[i] 
-                + ' ' + self.arg3[i] + ' ' + self.instruction[i] + ' ' + str(self.PC) )
+                + self.arg0[i] + ' ' + self.arg1[i] + ' ' + self.arg2[i] 
+                + ' ' + self.arg3[i] + ' ' + self.instruction[i] + ' ' + str(self.address[i]) )
 
             if self.validInstr[i] == '0':
                 dfile.write( ' Invalid Instruction\n' ) 
@@ -54,22 +59,26 @@ class state:
                     if self.opcode[i] == '00000':
                             #functions
                             if self.instruction[i] == '000000':
-                                if (self.validInstr[i] + self.opcode[i] + self.address[i] + self.arg1[i] + self.arg2[i] + self.arg3[i] + self.instruction[i]).split() == '00000000000000000000000000000000':
+                                if (self.validInstr[i] + self.opcode[i] + self.arg0[i] + self.arg1[i] + self.arg2[i] + self.arg3[i] + self.instruction[i]).split() == '00000000000000000000000000000000':
                                     dfile.write( ' NOP\n')
                                 else: #SLL
                                     rd = int(self.arg2[i],2)
                                     rt = int(self.arg1[i],2)
                                     sa = int(self.arg3[i],2)
-                                    dfile.write( ' SLL R' + str(rd) + ', R' + str(rt) + ', #' + str(sa) +'\n')        
+                                    dfile.write( ' SLL\tR' + str(rd) + ', R' + str(rt) + ', #' + str(sa) +'\n')        
+                            
                             elif self.instruction[i] == '000010': #SRL
                                 rd = int(self.arg2[i],2)
                                 rt = int(self.arg1[i],2)
                                 sa = int(self.arg3[i],2)
-                                dfile.write( ' SRL R' + str(rt) + ', R' + str(rd) + ', #' + str(sa) + '\n')
+                                dfile.write( ' SRL\tR' + str(rt) + ', R' + str(rd) + ', #' + str(sa) + '\n')
+                            
                             elif self.instruction[i] == '001000': #JR
-                                rs = int(self.address[])
-                        #     elif self.instruction[i] == 001010:
-                        #         #MOVZ
+                                rs = int(self.arg0[i])
+                                dfile.write( ' JR\tR' + str(rs))
+
+                            elif self.instruction[i] == '001010':
+                                #MOVZ
                         #     elif self.instruction[i] == 100000:
                         #         #ADD
                         #     elif self.instruction[i] == 100010:
