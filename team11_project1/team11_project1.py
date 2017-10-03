@@ -51,6 +51,8 @@ class state:
         rd = 0
         sa = 0
         offset = 0
+        towrite = ''
+        sfile.write('====================\n')
         for i in range(self.numInstructions):
 
             dfile.write(self.validInstr[i] + ' ' + self.opcode[i] + ' ' 
@@ -135,6 +137,7 @@ class state:
                     
                     #opcode 8
                     elif self.opcode[i] == '01000': #ADDI
+                    ##put the stuff into the dis file
                         rs = int(self.arg0[i],2)
                         rt = int(self.arg1[i],2)
                         offset = self.arg2[i] + self.arg3[i] + self.instruction[i]
@@ -142,8 +145,21 @@ class state:
                             offset = ((int(offset,2) ^ 0b1111111111111111) + 1) * -1
                         else:
                             offset = int(offset,2)
-                        dfile.write( ' ADDI\tR' + str(rt) + ', R' + str(rs) + ', #' + str(offset) + '\n')
-                        
+                        towrite = ' ADDI\tR' + str(rt) + ', R' + str(rs) + ', #' + str(offset) + '\n'
+                        dfile.write( towrite)
+
+                        ##do the action
+                        self.R[rs] = self.R[rt] + offset
+
+                        ##put the stuff in the sim file
+                        sfile.write( 'cycle:' + str(self.cycle) + towrite )
+                        sfile.write( '\nregisters:\n')
+                        self.writeRegs(sfile)
+                        #write memory
+                        sfile.write( '\ndata:' )
+                        # self.writeMem(sfile)
+                        self.cycle += 1
+
                     #opcode 0x2b
                     elif self.opcode[i] == '01011': #SW
                         rt = int(self.arg1[i],2)
@@ -168,9 +184,24 @@ class state:
             self.PC += 4
         for i in range(self.numInstructions - 1, len(self.memory)):
             dfile.write( self.memory[i] + '\t' + str( 96 + 4 * (i + 1)) + ' ' + str(self.memoryd[i]) + '\n')
-            
-    # def sim( self, sfile ):
 
+    def writeRegs( self, sfile ):
+        sfile.write('r00:\t')
+        for i in range(8):
+            sfile.write(str(self.R[i]) + '\t')
+        sfile.write('\nr08:\t')
+        for i in range(8,16):
+            sfile.write(str(self.R[i]) + '\t')
+        sfile.write('\nr16:\t')
+        for i in range(16,24):
+            sfile.write(str(self.R[i]) + '\t')
+        sfile.write('\nr24:\t')
+        for i in range(24,32):
+            sfile.write(str(self.R[i]) + '\t')
+        sfile.write('\n')
+
+    # def writeMem( self, sfile )
+    
 
 def main(argv):
     try:
