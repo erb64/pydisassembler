@@ -60,80 +60,80 @@ class state:
                 + ' ' + self.arg3[i] + ' ' + self.instruction[i] + '\t' + str(self.address[i]) )
 
             if self.validInstr[i] == '0':
-                dfile.write( ' Invalid Instruction\n' ) 
+                dfile.write( '\tInvalid Instruction\n' ) 
             else: # self.validInstr[i] == '1':
                         #opcode 0
                     if (self.validInstr[i] + self.opcode[i] + self.arg0[i] + self.arg1[i] + self.arg2[i] + self.arg3[i] + self.instruction[i]) == '10000000000000000000000000001101':
-                        dfile.write( ' BREAK\n')
+                        dfile.write( '\tBREAK\n')
                     elif self.opcode[i] == '00000':
                             #functions
                             if self.instruction[i] == '000000':
                                 if (self.validInstr[i] + self.opcode[i] + self.arg0[i] + self.arg1[i] + self.arg2[i] + self.arg3[i] + self.instruction[i]).split() == '00000000000000000000000000000000':
-                                    dfile.write( ' NOP\n')
+                                    dfile.write( '\tNOP\n')
                                 else: #SLL
                                     rd = int(self.arg2[i],2)
                                     rt = int(self.arg1[i],2)
                                     sa = int(self.arg3[i],2)
-                                    dfile.write( ' SLL\tR' + str(rd) + ', R' + str(rt) + ', #' + str(sa) +'\n')        
+                                    dfile.write( '\tSLL\tR' + str(rd) + ', R' + str(rt) + ', #' + str(sa) +'\n')        
                             
                             elif self.instruction[i] == '000010': #SRL
                                 rd = int(self.arg2[i],2)
                                 rt = int(self.arg1[i],2)
                                 sa = int(self.arg3[i],2)
-                                dfile.write( ' SRL\tR' + str(rt) + ', R' + str(rd) + ', #' + str(sa) + '\n')
+                                dfile.write( '\tSRL\tR' + str(rt) + ', R' + str(rd) + ', #' + str(sa) + '\n')
                             
                             elif self.instruction[i] == '001000': #JR
                                 rs = int(self.arg0[i],2)
-                                dfile.write( ' JR\tR' + str(rs))
+                                dfile.write( '\tJR\tR' + str(rs))
 
                             elif self.instruction[i] == '001010': #MOVZ
                                 rs = int(self.arg0[i],2)
                                 rt = int(self.arg1[i],2)
                                 rd = int(self.arg2[i],2)
-                                dfile.write( ' MOVZ\tR' + str(rd) + ', R' + str(rs) + ', R' + str(rt) + '\n')
+                                dfile.write( '\tMOVZ\tR' + str(rd) + ', R' + str(rs) + ', R' + str(rt) + '\n')
 
                             
                             elif self.instruction[i] == '100000': #ADD
                                 rs = int(self.arg0[i],2)
                                 rt = int(self.arg1[i],2)
                                 rd = int(self.arg2[i],2)
-                                dfile.write( ' ADD\tR' + str(rd) + ', R' + str(rs) + ', R' + str(rt) + '\n') 
+                                dfile.write( '\tADD\tR' + str(rd) + ', R' + str(rs) + ', R' + str(rt) + '\n') 
                             
                             elif self.instruction[i] == '100010': #SUB
                                 rs = int(self.arg0[i],2)
                                 rt = int(self.arg1[i],2)
                                 rd = int(self.arg2[i],2)
-                                dfile.write( ' SUB\tR' + str(rd) + ', R' + str(rs) + ', R' + str(rt) + '\n')
+                                dfile.write( '\tSUB\tR' + str(rd) + ', R' + str(rs) + ', R' + str(rt) + '\n')
                             
                             elif self.instruction[i] == '100100': #AND
                                 rs = int(self.arg0[i],2)
                                 rt = int(self.arg1[i],2)
                                 rd = int(self.arg2[i],2)
-                                dfile.write( ' AND\tR' + str(rd) + ', R' + str(rs) + ', R' + str(rt) + '\n') 
+                                dfile.write( '\tAND\tR' + str(rd) + ', R' + str(rs) + ', R' + str(rt) + '\n') 
                             
                             elif self.instruction[i] == '100101': #OR
                                 rs = int(self.arg0[i],2)
                                 rt = int(self.arg1[i],2)
                                 rd = int(self.arg2[i],2)
-                                dfile.write( ' OR\tR' + str(rd) + ', R' + str(rs) + ', R' + str(rt) + '\n')
+                                dfile.write( '\tOR\tR' + str(rd) + ', R' + str(rs) + ', R' + str(rt) + '\n')
     
                     #opcode 1
                     elif self.opcode[i] == '00001': #BLTZ Branch on
                         rs = int(self.arg0[i],2)
                         offset = int((self.arg2[i] + self.arg3[i] + self.instruction[i]),2) * 4# shifted left two bits
-                        dfile.write( ' BLTZ\tR' + str(rs) + ', #' + str(offset) + '\n')
+                        dfile.write( '\tBLTZ\tR' + str(rs) + ', #' + str(offset) + '\n')
       
                     #opcode 2
                     elif self.opcode[i] == '00010': #J
                         offset = int((self.arg0[i] + self.arg1[i] + self.arg2[i] + self.arg3[i] + self.instruction[i]),2) * 4 #shifted left two bits
-                        dfile.write( ' J\t#' + str(offset) + '\n')
+                        dfile.write( '\tJ\t#' + str(offset) + '\n')
                         
                     #opcode 4
                     elif self.opcode[i] == '00100': #BEQ
                         rs = int(self.arg0[i],2)
                         rt = int(self.arg1[i],2)
                         offset = int((self.arg2[i] + self.arg3[i] + self.instruction[i]),2)
-                        dfile.write( ' BEQ\tR' + str(rs) + ', R' + str(rt) + ', #' + str(offset) + '\n')
+                        dfile.write( '\tBEQ\tR' + str(rs) + ', R' + str(rt) + ', #' + str(offset) + '\n')
                     
                     #opcode 8
                     elif self.opcode[i] == '01000': #ADDI
@@ -145,7 +145,7 @@ class state:
                             offset = ((int(offset,2) ^ 0b1111111111111111) + 1) * -1
                         else:
                             offset = int(offset,2)
-                        towrite = ' ADDI\tR' + str(rt) + ', R' + str(rs) + ', #' + str(offset) + '\n'
+                        towrite = '\tADDI\tR' + str(rt) + ', R' + str(rs) + ', #' + str(offset) + '\n'
                         dfile.write( towrite)
 
                         ##do the action
@@ -165,25 +165,25 @@ class state:
                         rt = int(self.arg1[i],2)
                         rd = int(self.arg0[i],2) #base
                         offset = int((self.arg2[i] + self.arg3[i] + self.instruction[i]),2)
-                        dfile.write( ' SW\tR' + str(rt) + ', ' + str(offset) + '(R' + str(rd) + ')\n')
+                        dfile.write( '\tSW\tR' + str(rt) + ', ' + str(offset) + '(R' + str(rd) + ')\n')
                     
                     #opcode 0x23
                     elif self.opcode[i] == '00011': #LW
                         rt = int(self.arg1[i],2)
                         rd = int(self.arg0[i],2) #base
                         offset = int((self.arg2[i] + self.arg3[i] + self.instruction[i]),2)
-                        dfile.write( ' LW\tR' + str(rt) + ', ' + str(offset) + '(R' + str(rd) + ')\n')
+                        dfile.write( '\tLW\tR' + str(rt) + ', ' + str(offset) + '(R' + str(rd) + ')\n')
                     
                     #opcode 0x1C
                     elif self.opcode[i] == '11100': #MUL
                         rs = int(self.arg0[i],2)
                         rt = int(self.arg1[i],2)
                         rd = int(self.arg2[i],2)
-                        dfile.write( ' MUL\tR' + str(rd) + ', R' + str(rs) + ', R' + str(rt) + '\n')
+                        dfile.write( '\tMUL\tR' + str(rd) + ', R' + str(rs) + ', R' + str(rt) + '\n')
 
             self.PC += 4
         for i in range(self.numInstructions - 1, len(self.memory)):
-            dfile.write( self.memory[i] + '\t' + str( 96 + 4 * (i + 1)) + ' ' + str(self.memoryd[i]) + '\n')
+            dfile.write( self.memory[i] + '\t' + str( 96 + 4 * (i + 1)) + '\t' + str(self.memoryd[i]) + '\n')
 
     def writeRegs( self, sfile ):
         sfile.write('r00:\t')
@@ -201,7 +201,7 @@ class state:
         sfile.write('\n')
 
     # def writeMem( self, sfile )
-    
+
 
 def main(argv):
     try:
@@ -224,11 +224,11 @@ def main(argv):
         line[11:16],line[16:21],line[21:26])
 
     while line[0:32] != '10000000000000000000000000001101': 
+        line = f.readline()
         computer.addInstruction(line[26:32],line[1:6],line[0:1],line[6:11],
             line[11:16],line[16:21],line[21:26])
         computer.memory.append(line[0:32])
         computer.memoryd.append(int(line[0:32]))
-        line = f.readline()
     
     for line in f:
         computer.memory.append(line[0:32])
