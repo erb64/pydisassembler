@@ -77,10 +77,13 @@ class state:
                                 rs = int(self.arg0[i])
                                 dfile.write( ' JR\tR' + str(rs))
 
-                            elif self.instruction[i] == '001010':
-                                #MOVZ
-                        #     elif self.instruction[i] == 100000:
-                        #         #ADD
+                            elif self.instruction[i] == '001010': #MOVZ
+                                rs = int(self.arg0[i])
+                                rt = int(self.arg1[i])
+                                rd = int(self.arg2[i])
+                                dfile.write( ' MOVZ\tR' + str(rd) + ', R' + str(rs) + ', R' + str(rt) + '\n')
+                            elif self.instruction[i] == 100000: #ADD
+                                
                         #     elif self.instruction[i] == 100010:
                         #         #SUB
                         #     elif self.instruction[i] == 100100:
