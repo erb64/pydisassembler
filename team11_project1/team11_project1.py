@@ -200,7 +200,9 @@ class state:
             sfile.write(str(self.R[i]) + '\t')
         sfile.write('\n')
 
-    # def writeMem( self, sfile )
+    def writeMem( self, sfile ):
+        sfile.write( str( self.numInstructions*4+96 ) + '\t')
+
 
 
 def main(argv):
