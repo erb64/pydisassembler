@@ -12,8 +12,6 @@ class state:
     numInstructions = 0 #includes BREAK
     cycle = 1
     R = [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ] #registers 0-32 (for _sim.txt)
-    # inputFileName = ''
-    # outputFileName = ''
     
     def __init__( self, mem ):
         self.rawMemory = mem
@@ -21,7 +19,6 @@ class state:
     def disassemble( self ):
         i = 0
         while True:
-        
             if self.rawMemory[i][0:1] == '0':
                 self.instruction.append('Invalid Instruction')
                 self.address.append(self.PC + (i * 4))
@@ -31,7 +28,6 @@ class state:
                 self.numInstructions+=1
                 i = i + 1
             else:
-                
                 #opcode 0
                 if (self.rawMemory[i][0:32] == '10000000000000000000000000001101'):
                     self.instruction.append('BREAK')
@@ -245,9 +241,10 @@ class state:
 
     def simulate( self, sfile ):
         sfile.write('====================\n')
-        bk  = self.numInstructions * 4 + 96
+        bk  = self.numInstructions * 4 + 96 ##address of break
+
         while True:
-            i = ((self.PC) - 96) / 4
+            i = ((self.PC) - 96) / 4 ##index value associated with address of PC
             if self.instruction[i] in ['NOP', 'Invalid Instruction']:
                 self.PC += 4
             elif self.instruction[i] == 'ADDI':
@@ -262,7 +259,6 @@ class state:
                 self.writeData( sfile )
                 sfile.write('\n====================\n')
                 self.cycle += 1
-                # self.PC = self.numInstructions * 4 + 96
                 self.PC += 4
 
             elif self.instruction[i] == 'SW':
@@ -316,7 +312,7 @@ class state:
                 sfile.write( str(self.arg2[i]) + ', #' + str(self.arg3[i]) + '\n\n')
 
                 #action
-                self.R[self.arg1[i]] = self.R[self.arg2[i]] * (2 * self.arg3[i]) #shifted left by arg3 bits means multiplied by 2 arg3 times
+                self.R[self.arg1[i]] = self.R[self.arg2[i]] * pow(2, self.arg3[i]) #shifted left by arg3 bits means multiplied by 2 arg3 times
 
                 self.writeRegs( sfile )
                 self.writeData( sfile )
@@ -374,9 +370,6 @@ class state:
                 self.writeData( sfile )
                 sfile.write('\n')
                 break;
-
-
-
 
     def writeRegs( self, sfile ):
         sfile.write('registers:\nr00:')
