@@ -246,11 +246,11 @@ class state:
     def simulate( self, sfile ):
         sfile.write('====================\n')
         bk  = self.numInstructions * 4 + 96
-        while self.PC != (bk):
+        while True:
             i = ((self.PC) - 96) / 4
             if self.instruction[i] in ['NOP', 'Invalid Instruction']:
                 self.PC += 4
-            if self.instruction[i] == 'ADDI':
+            elif self.instruction[i] == 'ADDI':
                 sfile.write('cycle:' + str(self.cycle) + '\t' + str(self.address[i]))
                 sfile.write('\t' + self.instruction[i] + '\tR'+ str(self.arg1[i]) + ', R')
                 sfile.write( str(self.arg2[i]) + ', #' + str(self.arg3[i]) + '\n\n')
@@ -264,6 +264,7 @@ class state:
                 self.cycle += 1
                 # self.PC = self.numInstructions * 4 + 96
                 self.PC += 4
+
             elif self.instruction[i] == 'SW':
                 sfile.write('cycle:' + str(self.cycle) + '\t' + str(self.address[i]))
                 sfile.write('\t' + self.instruction[i] + '\tR'+ str(self.arg1[i]) + ', ')
@@ -294,37 +295,117 @@ class state:
                 self.cycle += 1
                 self.PC += 4
 
-                self.PC = self.numInstructions * 4 + 96 ### for testing only
+            elif self.instruction[i] == 'BLTZ':
+                sfile.write('cycle:' + str(self.cycle) + '\t' + str(self.address[i]))
+                sfile.write('\t' + self.instruction[i] + '\tR'+ str(self.arg1[i])+ ', #' + str(self.arg2[i]) + '\n\n')
+
+                #action
+                if self.R[self.arg1[i]] < 0:
+                    self.PC += self.arg2[i]
+                
+                self.PC += 4
+
+                self.writeRegs( sfile )
+                self.writeData( sfile )
+                sfile.write('\n====================\n')
+                self.cycle += 1
+
+            elif self.instruction[i] == 'SLL':
+                sfile.write('cycle:' + str(self.cycle) + '\t' + str(self.address[i]))
+                sfile.write('\t' + self.instruction[i] + '\tR'+ str(self.arg1[i]) + ', R')
+                sfile.write( str(self.arg2[i]) + ', #' + str(self.arg3[i]) + '\n\n')
+
+                #action
+                self.R[self.arg1[i]] = self.R[self.arg2[i]] * (2 * self.arg3[i]) #shifted left by arg3 bits means multiplied by 2 arg3 times
+
+                self.writeRegs( sfile )
+                self.writeData( sfile )
+                sfile.write('\n====================\n')
+                self.cycle += 1
+                self.PC += 4
+
+            elif self.instruction[i] == 'J':
+                sfile.write('cycle:' + str(self.cycle) + '\t' + str(self.address[i]))
+                sfile.write('\t' + self.instruction[i] + '\t#'+ str(self.arg1[i])+ '\n\n')
+
+                #action
+                self.PC = self.arg1[i]
+
+                self.writeRegs( sfile )
+                self.writeData( sfile )
+                sfile.write('\n====================\n')
+                self.cycle += 1
+                #no increment because jump
+
+            elif self.instruction[i] == 'SUB':
+                sfile.write('cycle:' + str(self.cycle) + '\t' + str(self.address[i]))
+                sfile.write('\t' + self.instruction[i] + '\tR'+ str(self.arg1[i]) + ', R')
+                sfile.write( str(self.arg2[i]) + ', R' + str(self.arg3[i]) + '\n\n')
+ 
+                #action
+                self.R[self.arg1[i]] = self.R[self.arg2[i]] - self.R[self.arg3[i]]
+
+                self.writeRegs( sfile )
+                self.writeData( sfile )
+                sfile.write('\n====================\n')
+                self.cycle += 1
+                self.PC += 4
+
+            elif self.instruction[i] == 'ADD':
+                sfile.write('cycle:' + str(self.cycle) + '\t' + str(self.address[i]))
+                sfile.write('\t' + self.instruction[i] + '\tR'+ str(self.arg1[i]) + ', R')
+                sfile.write( str(self.arg2[i]) + ', R' + str(self.arg3[i]) + '\n\n')
+ 
+
+                #action
+                self.R[self.arg1[i]] = self.R[self.arg2[i]] + self.R[self.arg3[i]]
+
+                self.writeRegs( sfile )
+                self.writeData( sfile )
+                sfile.write('\n====================\n')
+                self.cycle += 1
+                self.PC += 4
+
+            elif self.instruction[i] == 'BREAK':
+                sfile.write('cycle:' + str(self.cycle) + '\t' + str(self.address[i]))
+                sfile.write('\t' + self.instruction[i] + '\n\n')
+
+                self.writeRegs( sfile )
+                self.writeData( sfile )
+                sfile.write('\n')
+                break;
+
+
 
 
     def writeRegs( self, sfile ):
-        sfile.write('registers:\nr00:\t')
+        sfile.write('registers:\nr00:')
         for i in range(8):
-            sfile.write(str(self.R[i]) + '\t')
-        sfile.write('\nr08:\t')
+            sfile.write('\t' + str(self.R[i]) )
+        sfile.write('\nr08:')
         for i in range(8,16):
-            sfile.write(str(self.R[i]) + '\t')
-        sfile.write('\nr16:\t')
+            sfile.write('\t' + str(self.R[i]) )
+        sfile.write('\nr16:')
         for i in range(16,24):
-            sfile.write(str(self.R[i]) + '\t')
-        sfile.write('\nr24:\t')
+            sfile.write('\t' + str(self.R[i]) )
+        sfile.write('\nr24:')
         for i in range(24,32):
-            sfile.write(str(self.R[i]) + '\t')
+            sfile.write('\t' + str(self.R[i]) )
         sfile.write('\n')
 
     def writeData( self, sfile ):
-        startmemory = ( (self.numInstructions + 1) * 4 + 96)
-        sfile.write('\ndata:\n' + str(startmemory) + ':\t')
+        startmemory = ( (self.numInstructions) * 4 + 96)
+        sfile.write('\ndata:\n' + str(startmemory) + ':')
         for i in range(8):
-            sfile.write(str(self.memory[i]) + '\t')
+            sfile.write('\t' + str(self.memory[i]) )
         startmemory += 32
-        sfile.write('\n' + str(startmemory) + ':\t')
+        sfile.write('\n' + str(startmemory) + ':')
         for i in range(8,16):
-            sfile.write(str(self.memory[i]) + '\t')
+            sfile.write('\t' + str(self.memory[i]) )
         startmemory += 32
-        sfile.write('\n' + str(startmemory) + ':\t')
+        sfile.write('\n' + str(startmemory) + ':')
         for i in range(16,24):
-            sfile.write(str(self.memory[i]) + '\t')
+            sfile.write('\t' + str(self.memory[i]) )
         sfile.write('\n')
 
 def main(argv):
