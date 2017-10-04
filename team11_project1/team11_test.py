@@ -243,6 +243,90 @@ class state:
             j += 1 
             i += 1
 
+    def simulate( self, sfile ):
+        sfile.write('====================\n')
+        bk  = self.numInstructions * 4 + 96
+        while self.PC != (bk):
+            i = ((self.PC) - 96) / 4
+            if self.instruction[i] in ['NOP', 'Invalid Instruction']:
+                self.PC += 4
+            if self.instruction[i] == 'ADDI':
+                sfile.write('cycle:' + str(self.cycle) + '\t' + str(self.address[i]))
+                sfile.write('\t' + self.instruction[i] + '\tR'+ str(self.arg1[i]) + ', R')
+                sfile.write( str(self.arg2[i]) + ', #' + str(self.arg3[i]) + '\n\n')
+
+                #action
+                self.R[self.arg1[i]] = self.R[self.arg2[i]] + self.arg3[i] 
+
+                self.writeRegs( sfile )
+                self.writeData( sfile )
+                sfile.write('\n====================\n')
+                self.cycle += 1
+                # self.PC = self.numInstructions * 4 + 96
+                self.PC += 4
+            elif self.instruction[i] == 'SW':
+                sfile.write('cycle:' + str(self.cycle) + '\t' + str(self.address[i]))
+                sfile.write('\t' + self.instruction[i] + '\tR'+ str(self.arg1[i]) + ', ')
+                sfile.write( str(self.arg2[i]) + '(R' + str(self.arg3[i]) + ')\n\n')
+
+                #action
+                memind = (self.arg2[i] + self.R[self.arg3[i]] - bk) / 4
+                self.memory[memind] = self.R[self.arg1[i]]
+
+                self.writeRegs( sfile )
+                self.writeData( sfile )
+                sfile.write('\n====================\n')
+                self.cycle += 1
+                self.PC += 4
+                
+            elif self.instruction[i] == 'LW':
+                sfile.write('cycle:' + str(self.cycle) + '\t' + str(self.address[i]))
+                sfile.write('\t' + self.instruction[i] + '\tR'+ str(self.arg1[i]) + ', ')
+                sfile.write( str(self.arg2[i]) + '(R' + str(self.arg3[i]) + ')\n\n')
+
+                #action
+                memind = (self.arg2[i] + self.R[self.arg3[i]] - bk) / 4
+                self.R[self.arg1[i]] = self.memory[memind]
+
+                self.writeRegs( sfile )
+                self.writeData( sfile )
+                sfile.write('\n====================\n')
+                self.cycle += 1
+                self.PC += 4
+
+                self.PC = self.numInstructions * 4 + 96 ### for testing only
+
+
+    def writeRegs( self, sfile ):
+        sfile.write('registers:\nr00:\t')
+        for i in range(8):
+            sfile.write(str(self.R[i]) + '\t')
+        sfile.write('\nr08:\t')
+        for i in range(8,16):
+            sfile.write(str(self.R[i]) + '\t')
+        sfile.write('\nr16:\t')
+        for i in range(16,24):
+            sfile.write(str(self.R[i]) + '\t')
+        sfile.write('\nr24:\t')
+        for i in range(24,32):
+            sfile.write(str(self.R[i]) + '\t')
+        sfile.write('\n')
+
+    def writeData( self, sfile ):
+        startmemory = ( (self.numInstructions + 1) * 4 + 96)
+        sfile.write('\ndata:\n' + str(startmemory) + ':\t')
+        for i in range(8):
+            sfile.write(str(self.memory[i]) + '\t')
+        startmemory += 32
+        sfile.write('\n' + str(startmemory) + ':\t')
+        for i in range(8,16):
+            sfile.write(str(self.memory[i]) + '\t')
+        startmemory += 32
+        sfile.write('\n' + str(startmemory) + ':\t')
+        for i in range(16,24):
+            sfile.write(str(self.memory[i]) + '\t')
+        sfile.write('\n')
+
 def main(argv):
     words = []
 
@@ -267,6 +351,7 @@ def main(argv):
 
     computer.disassemble()
     computer.printDis(disFile)
+    computer.simulate(simFile)
 
     f.close()
 
