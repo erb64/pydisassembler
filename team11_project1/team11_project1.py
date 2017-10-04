@@ -202,6 +202,8 @@ class state:
 
     def writeMem( self, sfile ):
         sfile.write( str( self.numInstructions*4+96 ) + '\t')
+        for i in range(8,16)
+            sfile.write(str(self.memoryd[i])+ '\t')
 
 
 
