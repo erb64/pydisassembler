@@ -21,6 +21,7 @@ class state:
     def disassemble( self ):
         i = 0
         while True:
+        
             if self.rawMemory[i][0:1] == '0':
                 self.instruction.append('Invalid Instruction')
                 self.address.append(self.PC + (i * 4))
@@ -28,191 +29,199 @@ class state:
                 self.arg2.append('')
                 self.arg3.append('')
                 self.numInstructions+=1
-                i+=1
-            else: # self.validInstr[i] == '1':
-                        #opcode 0
-                    if (self.rawMemory[i] == '10000000000000000000000000001101'):
-                        self.instruction.append('BREAK')
-                        self.address.append(self.PC + (i * 4))
-                        self.arg1.append('')
-                        self.arg2.append('')
-                        self.arg3.append('')
-                        self.numInstructions+=1
-                        i+=1
-                        break;
-                    elif self.rawMemory[i][1:6] == '00000':
-                            #functions
-                            if self.rawMemory[i][26:32] == '000000':
-                                if self.rawMemory[i] == '00000000000000000000000000000000':
-                                    self.instruction.append( 'NOP' )
-                                    self.validInstr.append('')
-                                    self.address.append(self.PC + (i * 4))
-                                    self.arg1.append('')
-                                    self.arg2.append('')
-                                    self.arg3.append('')
-                                    self.numInstructions+=1
-                                    i+=1
-                                else: #SLL Format: SLL rd, rt, sa
-                                    self.instruction.append( 'SLL' )
-                                    self.address.append(self.PC + (i * 4))
-                                    self.arg1.append(int(self.rawMemory[i][16:21],2))
-                                    self.arg2.append(int(self.rawMemory[i][11:16],2))
-                                    self.arg3.append(int(self.rawMemory[i][21:26],2))
-                                    self.numInstructions+=1
-                                    i+=1
-                                    #dfile.write( '\tSLL\tR' + str(rd) + ', R' + str(rt) + ', #' + str(sa) +'\n')        
+                i = i + 1
+            else:
+                
+                #opcode 0
+                if (self.rawMemory[i][0:32] == '10000000000000000000000000001101'):
+                    self.instruction.append('BREAK')
+                    self.address.append(self.PC + (i * 4))
+                    self.arg1.append('')
+                    self.arg2.append('')
+                    self.arg3.append('')
+                    self.numInstructions+=1
+                    i = i + 1
+                    break;
+                elif self.rawMemory[i][1:6] == '00000':
+
+                    if self.rawMemory[i][26:32] == '000000':
+                        if self.rawMemory[i][0:32] == '00000000000000000000000000000000':
+                            self.instruction.append( 'NOP' )
+                            self.validInstr.append('')
+                            self.address.append(self.PC + (i * 4))
+                            self.arg1.append('')
+                            self.arg2.append('')
+                            self.arg3.append('')
+                            self.numInstructions+=1
+                            i = i + 1
+                        else: #SLL Format: SLL rd, rt, sa
+                            self.instruction.append( 'SLL' )
+                            self.address.append(self.PC + (i * 4))
+                            self.arg1.append(int(self.rawMemory[i][16:21],2))
+                            self.arg2.append(int(self.rawMemory[i][11:16],2))
+                            self.arg3.append(int(self.rawMemory[i][21:26],2))
+                            self.numInstructions+=1
+                            i = i + 1
                             
-                            elif self.rawMemory[i][26:32] == '000010': #SRL Format: SRL rd, rt, sa
-                                    self.instruction.append( 'SRL' )
-                                    self.address.append(self.PC + (i * 4))
-                                    self.arg1.append(int(self.rawMemory[i][16:21],2))
-                                    self.arg2.append(int(self.rawMemory[i][11:16],2))
-                                    self.arg3.append(int(self.rawMemory[i][21:26],2))
-                                    self.numInstructions+=1
-                                    i+=1
-                                    #dfile.write( '\tSRL\tR' + str(rt) + ', R' + str(rd) + ', #' + str(sa) + '\n')
-                            
-                            elif self.rawMemory[i][26:32] == '001000': #JR Format: JR rs
-                                    self.instruction.append( 'JR' )
-                                    self.validInstr.append('')
-                                    self.opcode.append('') 
-                                    self.address.append(self.PC + (i * 4))
-                                    self.arg1.append(int(self.rawMemory[i][6:11],2))
-                                    self.arg2.append('')
-                                    self.arg3.append('')
-                                    self.numInstructions+=1
-                                    i+=1
-                                    #dfile.write( '\tJR\tR' + str(rs))
+                    elif self.rawMemory[i][26:32] == '000010': #SRL Format: SRL rd, rt, sa
+                            self.instruction.append( 'SRL' )
+                            self.address.append(self.PC + (i * 4))
+                            self.arg1.append(int(self.rawMemory[i][16:21],2))
+                            self.arg2.append(int(self.rawMemory[i][11:16],2))
+                            self.arg3.append(int(self.rawMemory[i][21:26],2))
+                            self.numInstructions+=1
+                            i = i + 1
+                            #dfile.write( '\tSRL\tR' + str(rt) + ', R' + str(rd) + ', #' + str(sa) + '\n')
+                    
+                    elif self.rawMemory[i][26:32] == '001000': #JR Format: JR rs
+                            self.instruction.append( 'JR' )
+                            self.validInstr.append('')
+                            self.opcode.append('') 
+                            self.address.append(self.PC + (i * 4))
+                            self.arg1.append(int(self.rawMemory[i][6:11],2))
+                            self.arg2.append('')
+                            self.arg3.append('')
+                            self.numInstructions+=1
+                            i = i + 1
+                            #dfile.write( '\tJR\tR' + str(rs))
 
-                            elif self.rawMemory[i][26:32] == '001010': #MOVZ Format: MOVZ rd, rs, rt
-                                self.instruction.append( 'MOVZ' )
-                                self.address.append(self.PC + (i * 4))
-                                self.arg1.append(int(self.rawMemory[i][16:21],2))
-                                self.arg2.append(int(self.rawMemory[i][6:11],2))
-                                self.arg3.append(int(self.rawMemory[i][11:16],2))
-                                self.numInstructions+=1
-                                i+=1
-                                #dfile.write( '\tMOVZ\tR' + str(rd) + ', R' + str(rs) + ', R' + str(rt) + '\n')
-
-                            elif self.rawMemory[i][26:32] == '100000': #ADD Format: ADD rd, rs, rt
-                                self.instruction.append( 'ADD' )
-                                self.address.append(self.PC + (i * 4))
-                                self.arg1.append(int(self.rawMemory[i][16:21],2))
-                                self.arg2.append(int(self.rawMemory[i][6:11],2))
-                                self.arg3.append(int(self.rawMemory[i][11:16],2))
-                                self.numInstructions+=1
-                                i+=1
-                   
-                            elif self.rawMemory[i][26:32] == '100010': #SUB Format: SUB rd, rs, rt
-                                self.instruction.append( 'SUB' )
-                                self.address.append(self.PC + (i * 4))
-                                self.arg1.append(int(self.rawMemory[i][16:21],2))
-                                self.arg2.append(int(self.rawMemory[i][6:11],2))
-                                self.arg3.append(int(self.rawMemory[i][11:16],2))
-                                self.numInstructions+=1
-                                i+=1
-                       
-                            elif self.rawMemory[i][26:32] == '100100': #AND Format: AND rd, rs, rt
-                                self.instruction.append( 'AND' )
-                                self.address.append(self.PC + (i * 4))
-                                self.arg1.append(int(self.rawMemory[i][16:21],2))
-                                self.arg2.append(int(self.rawMemory[i][6:11],2))
-                                self.arg3.append(int(self.rawMemory[i][11:16],2))
-                                self.numInstructions+=1
-                                i+=1
-                         
-                            elif self.rawMemory[i][26:32] == '100101': #OR Format: OR rd, rs, rt
-                                self.instruction.append( 'AND' )
-                                self.address.append(self.PC + (i * 4))
-                                self.arg1.append(int(self.rawMemory[i][16:21],2))
-                                self.arg2.append(int(self.rawMemory[i][6:11],2))
-                                self.arg3.append(int(self.rawMemory[i][11:16],2))
-                                self.numInstructions+=1
-                                i+=1
-                           
-                    #opcode 1
-                    elif self.rawMemory[i][26:32] == '00001': #BLTZ Format: BLTZ rs, offset
-                        self.instruction.append( 'BLTZ' )
+                    elif self.rawMemory[i][26:32] == '001010': #MOVZ Format: MOVZ rd, rs, rt
+                        self.instruction.append( 'MOVZ' )
                         self.address.append(self.PC + (i * 4))
-                        self.arg1.append(int(self.rawMemory[i][6:11],2))
-                        self.arg2.append(int(self.rawMemory[i][16:32],2) * 4)
-                        self.arg3.append('')
-                        self.numInstructions+=1
-                        i+=1
-                  
-                    #opcode 2
-                    elif self.rawMemory[i][26:32] == '00010': #J
-                        self.instruction.append( 'J' )
-                        self.address.append(self.PC + (i * 4))
-                        self.arg1.append(int(self.rawMemory[i][6:32],2) * 4)
-                        self.arg2.append('')
-                        self.arg3.append('')
-                        self.numInstructions+=1
-                        i+=1 
-                        
-                    #opcode 4
-                    elif self.rawMemory[i][26:32] == '00100': #BEQ Format: BEQ rs, rt, offset
-                        self.instruction.append( 'BEQ' )
-                        self.address.append(self.PC + (i * 4))
-                        self.arg1.append(int(self.rawMemory[i][6:32],2) * 4)
-                        self.arg2.append('')
-                        self.arg3.append('')
-                        self.numInstructions+=1
-                        i+=1 
-
-                    #opcode 8
-                    elif self.rawMemory[i][26:32] == '01000': #ADDI Format: ADDI rt, rs, immediate
-                        self.instruction.append( 'ADDI' )
-                        self.address.append(self.PC + (i * 4))
-                        self.arg1.append(int(self.rawMemory[i][11:16],2))
+                        self.arg1.append(int(self.rawMemory[i][16:21],2))
                         self.arg2.append(int(self.rawMemory[i][6:11],2))
-                        self.arg3.append(int(self.rawMemory[i][16:32],2))
-                        if self.arg3[i][0:1] == '1':
-                            self.arg3[i] = ((self.arg3[i] ^ 0b1111111111111111) + 1) * -1
+                        self.arg3.append(int(self.rawMemory[i][11:16],2))
                         self.numInstructions+=1
-                        i+=1 
-                     
-                    #opcode 0x2b
-                    elif self.rawMemory[i][26:32] == '01011': #SW Format: SW rt, offset(base)
-                        self.instruction.append( 'SW' )
+                        i = i + 1
+                        #dfile.write( '\tMOVZ\tR' + str(rd) + ', R' + str(rs) + ', R' + str(rt) + '\n')
+
+                    elif self.rawMemory[i][26:32] == '100000': #ADD Format: ADD rd, rs, rt
+                        self.instruction.append( 'ADD' )
                         self.address.append(self.PC + (i * 4))
-                        self.arg1.append(int(self.rawMemory[i][11:16],2))
-                        self.arg2.append(int(self.rawMemory[i][16:32],2))
-                        self.arg3.append(int(self.rawMemory[i][0:16],2))
-                        i+=1 
-                    #opcode 0x23
-                    elif self.rawMemory[i][26:32] == '00011': #LW Format: LW rt, offset(base)
-                        self.instruction.append( 'LW' )
+                        self.arg1.append(int(self.rawMemory[i][16:21],2))
+                        self.arg2.append(int(self.rawMemory[i][6:11],2))
+                        self.arg3.append(int(self.rawMemory[i][11:16],2))
+                        self.numInstructions+=1
+                        i = i + 1
+           
+                    elif self.rawMemory[i][26:32] == '100010': #SUB Format: SUB rd, rs, rt
+                        self.instruction.append( 'SUB' )
                         self.address.append(self.PC + (i * 4))
-                        self.arg1.append(int(self.rawMemory[i][11:16],2))
-                        self.arg2.append(int(self.rawMemory[i][16:32],2))
-                        self.arg3.append(int(self.rawMemory[i][0:16],2))
-                        i+=1 
-                    #opcode 0x1C
-                    elif self.rawMemory[i][26:32] == '11100': #MUL Format: MUL rd, rs, rt
+                        self.arg1.append(int(self.rawMemory[i][16:21],2))
+                        self.arg2.append(int(self.rawMemory[i][6:11],2))
+                        self.arg3.append(int(self.rawMemory[i][11:16],2))
+                        self.numInstructions+=1
+                        i = i + 1
+               
+                    elif self.rawMemory[i][26:32] == '100100': #AND Format: AND rd, rs, rt
                         self.instruction.append( 'AND' )
                         self.address.append(self.PC + (i * 4))
                         self.arg1.append(int(self.rawMemory[i][16:21],2))
                         self.arg2.append(int(self.rawMemory[i][6:11],2))
                         self.arg3.append(int(self.rawMemory[i][11:16],2))
                         self.numInstructions+=1
-                        i+=1
-        while True:
-            self.address.append(self.address.append(self.PC + (i * 4)))
-            self.memory.append(int(self.rawMemory[i]),2)
-            if self.memory[i][0:1] == '1':
-                self.memory[i] = (((self.memory[i] ^ 0b11111111111111111111111111111111) + 1) * -1)
+                        i = i + 1
+                 
+                    elif self.rawMemory[i][26:32] == '100101': #OR Format: OR rd, rs, rt
+                        self.instruction.append( 'OR' )
+                        self.address.append(self.PC + (i * 4))
+                        self.arg1.append(int(self.rawMemory[i][16:21],2))
+                        self.arg2.append(int(self.rawMemory[i][6:11],2))
+                        self.arg3.append(int(self.rawMemory[i][11:16],2))
+                        self.numInstructions+=1
+                        i = i + 1
+                    else:
+                        print 'first else' 
+                        i = i + 1
+
+                #opcode 1
+                elif self.rawMemory[i][1:6] == '00001': #BLTZ Format: BLTZ rs, offset
+                    self.instruction.append( 'BLTZ' )
+                    self.address.append(self.PC + (i * 4))
+                    self.arg1.append(int(self.rawMemory[i][6:11],2))
+                    self.arg2.append(int(self.rawMemory[i][16:32],2) * 4)
+                    self.arg3.append('')
+                    self.numInstructions+=1
+                    i = i + 1
+
+              
+                #opcode 2
+                elif self.rawMemory[i][1:6] == '00010': #J
+                    self.instruction.append( 'J' )
+                    self.address.append(self.PC + (i * 4))
+                    self.arg1.append(int(self.rawMemory[i][6:32],2) * 4)
+                    self.arg2.append('')
+                    self.arg3.append('')
+                    self.numInstructions+=1
+                    i = i + 1 
+                    
+                #opcode 4
+                elif self.rawMemory[i][1:6] == '00100': #BEQ Format: BEQ rs, rt, offset
+                    self.instruction.append( 'BEQ' )
+                    self.address.append(self.PC + (i * 4))
+                    self.arg1.append(int(self.rawMemory[i][6:32],2) * 4)
+                    self.arg2.append('')
+                    self.arg3.append('')
+                    self.numInstructions+=1
+                    i = i + 1
+
+                #opcode 8
+                elif self.rawMemory[i][1:6] == '01000': #ADDI Format: ADDI rt, rs, immediate
+                    self.instruction.append( 'ADDI' )
+                    self.address.append(self.PC + (i * 4))
+                    self.arg1.append(int(self.rawMemory[i][11:16],2))
+                    self.arg2.append(int(self.rawMemory[i][6:11],2))
+                    self.arg3.append(int(self.rawMemory[i][16:32],2))
+                    if self.rawMemory[i][16:17] == '1':
+                        self.arg3[i] = ((self.arg3[i] ^ 0b1111111111111111) + 1) * -1
+                    self.numInstructions+=1
+                    i = i + 1 
+                 
+                #opcode 0x2b
+                elif self.rawMemory[i][1:6] == '01011': #SW Format: SW rt, offset(base)
+                    self.instruction.append( 'SW' )
+                    self.address.append(self.PC + (i * 4))
+                    self.arg1.append(int(self.rawMemory[i][11:16],2))
+                    self.arg2.append(int(self.rawMemory[i][16:32],2))
+                    self.arg3.append(int(self.rawMemory[i][6:11],2))
+                    self.numInstructions+=1
+                    i = i + 1 
+                #opcode 0x23
+                elif self.rawMemory[i][1:6] == '00011': #LW Format: LW rt, offset(base)
+                    self.instruction.append( 'LW' )
+                    self.address.append(self.PC + (i * 4))
+                    self.arg1.append(int(self.rawMemory[i][11:16],2))
+                    self.arg2.append(int(self.rawMemory[i][16:32],2))
+                    self.arg3.append(int(self.rawMemory[i][6:11],2))
+                    self.numInstructions+=1
+                    i = i + 1
+                #opcode 0x1C
+                elif self.rawMemory[i][1:6] == '11100': #MUL Format: MUL rd, rs, rt
+                    self.instruction.append( 'MUL' )
+                    self.address.append(self.PC + (i * 4))
+                    self.arg1.append(int(self.rawMemory[i][16:21],2))
+                    self.arg2.append(int(self.rawMemory[i][6:11],2))
+                    self.arg3.append(int(self.rawMemory[i][11:16],2))
+                    self.numInstructions+=1
+                    i = i + 1
+
+        j = 0
+        while i < len(self.rawMemory):
+            self.address.append(self.PC + (i * 4))
+            self.memory.append(int(self.rawMemory[i],2))
+            if self.rawMemory[i][0:1] == '1':
+                self.memory[j] = (((self.memory[j] ^ 0b11111111111111111111111111111111) + 1) * -1)
             i+=1
-            if i == len(self.rawMemory):
-                break
+            j+=1
 
     def printDis(self, dfile):
-        for i in range(self.numInstructions):
-            dfile.write( self.rawMemory[i][0:1] + ' ' + self.rawMemory[i][1:6] + ' ' + self.rawMemory[i][6:11] + ' ' + self.rawMemory[i][11:16])
-            dfile.write( ' ' + self.rawMemory[i][16:21] + ' ' + self.rawMemory[i][21:26] + ' ' + self.rawMemory[i][26:32] + ' ' + self.address[i])
+        i = 0
+        while i < self.numInstructions:
+            dfile.write( str(self.rawMemory[i][0:1]) + ' ' + str(self.rawMemory[i][1:6]) + ' ' + str(self.rawMemory[i][6:11]) + ' ' + str(self.rawMemory[i][11:16]))
+            dfile.write( ' ' + str(self.rawMemory[i][16:21]) + ' ' + str(self.rawMemory[i][21:26]) + ' ' + str(self.rawMemory[i][26:32]) + '\t' + str(self.address[i]))
             
             if self.instruction[i] in ['MOVZ', 'ADD', 'SUB', 'AND', 'OR', 'MUL']:
-                dfile.write( '\t' + self.instruction[i] + '\t\R '+ str(self.arg1[i]) + ', R' + str(self.arg2[i]) + ', R' + str(self.arg3[i]) + '\n')
+                dfile.write( '\t' + self.instruction[i] + '\tR'+ str(self.arg1[i]) + ', R' + str(self.arg2[i]) + ', R' + str(self.arg3[i]) + '\n')
             elif self.instruction[i] in ['SLL', 'SRL']:
                 dfile.write( '\t' + self.instruction[i] + '\tR' + str(self.arg1[i]) + ', R' + str(self.arg2[i]) + ', #' + str(self.arg3[i]) + '\n')
             elif self.instruction[i] in ['BEQ', 'ADDI']:
@@ -225,13 +234,14 @@ class state:
                 dfile.write( '\tJ\t#' + str(self.arg1[i]) + '\n')
             elif self.instruction[i] == 'JR':
                 dfile.write( '\tJR\tR' + str(self.arg1[i]) + '\n')
-            elif self.instrucion[i] in ['NOP', 'BREAK', 'Invalid Instruction']:
-                dfile.write( '\t' + self.instruction[i]+ '\t')
-    
+            elif self.instruction[i] in ['NOP', 'BREAK', 'Invalid Instruction']:
+                dfile.write( '\t' + self.instruction[i]+ '\n')
+            i += 1
         j = 0
-        for i in range(self.numInstructions, len(self.rawMemory)):
-            dfile.write( self.rawMemory[i][0:32] + '\t' + self.address[i] + '\t' + self.memory[j])
-        j += 1
+        while i < (len(self.rawMemory)):
+            dfile.write( str(self.rawMemory[i][0:32]) + '\t' + str(self.address[i]) + '\t' + str(self.memory[j]) + '\n')
+            j += 1 
+            i += 1
 
 def main(argv):
     words = []
@@ -254,8 +264,9 @@ def main(argv):
     for line in f:
         words.append(line[0:32])
     computer = state(words)
+
     computer.disassemble()
-    computer.printDis(dfile)
+    computer.printDis(disFile)
 
     f.close()
 
