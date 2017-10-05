@@ -305,6 +305,22 @@ class state:
                 self.writeData( sfile )
                 sfile.write('\n====================\n')
                 self.cycle += 1
+                
+            elif self.instruction[i] == 'BEQ':
+                sfile.write('cycle:' + str(self.cycle) + '\t' + str(self.address[i]))
+                sfile.write('\t' + self.instruction[i] + '\tR'+ str(self.arg1[i]) + ', R')
+                sfile.write( str(self.arg2[i]) + ', #' + str(self.arg3[i]) + '\n\n')
+                
+                #action
+                if self.R[self.arg1[i]] == self.R[self.arg2[i]]:
+                    self.PC += self.arg3[i]
+                    
+                self.PC += 4
+                
+                self.writeRegs( sfile )
+                self.writeData( sfile )
+                sfile.write('\n====================\n')
+                self.cycle += 1
 
             elif self.instruction[i] == 'SLL':
                 sfile.write('cycle:' + str(self.cycle) + '\t' + str(self.address[i]))
@@ -319,6 +335,20 @@ class state:
                 sfile.write('\n====================\n')
                 self.cycle += 1
                 self.PC += 4
+                
+            elif self.instruction[i] == 'SRL':
+                sfile.write('cycle:' + str(self.cycle) + '\t' + str(self.address[i]))
+                sfile.write('\t' + self.instruction[i] + '\tR'+ str(self.arg1[i]) + ', R')
+                sfile.write( str(self.arg2[i]) + ', #' + str(self.arg3[i]) + '\n\n')
+
+                #action
+                self.R[self.arg1[i]] = self.R[self.arg2[i]] / pow(2, self.arg3[i]) #shifted right by arg3 bits means multiplied by 2 arg3 times
+
+                self.writeRegs( sfile )
+                self.writeData( sfile )
+                sfile.write('\n====================\n')
+                self.cycle += 1
+                self.PC += 4 
 
             elif self.instruction[i] == 'J':
                 sfile.write('cycle:' + str(self.cycle) + '\t' + str(self.address[i]))
@@ -332,6 +362,18 @@ class state:
                 sfile.write('\n====================\n')
                 self.cycle += 1
                 #no increment because jump
+                
+            elif self.instruction[i] == 'JR':
+                sfile.write('cycle:' + str(self.cycle) + '\t' + str(self.address[i]))
+                sfile.write('\t' + self.instruction[i] + '\tR'+ str(self.arg1[i])+ '\n\n')
+
+                #action
+                self.PC = self.arg1[i]
+
+                self.writeRegs( sfile )
+                self.writeData( sfile )
+                sfile.write('\n====================\n')
+                self.cycle += 1
 
             elif self.instruction[i] == 'SUB':
                 sfile.write('cycle:' + str(self.cycle) + '\t' + str(self.address[i]))
@@ -352,7 +394,6 @@ class state:
                 sfile.write('\t' + self.instruction[i] + '\tR'+ str(self.arg1[i]) + ', R')
                 sfile.write( str(self.arg2[i]) + ', R' + str(self.arg3[i]) + '\n\n')
  
-
                 #action
                 self.R[self.arg1[i]] = self.R[self.arg2[i]] + self.R[self.arg3[i]]
 
@@ -370,7 +411,66 @@ class state:
                 self.writeData( sfile )
                 sfile.write('\n')
                 break;
+            
+            elif self.instruction[i] == 'MOVZ':
+                sfile.write('cycle:' + str(self.cycle) + '\t' + str(self.address[i]))
+                sfile.write('\t' + self.instruction[i] + '\tR'+ str(self.arg1[i]) + ', R')
+                sfile.write( str(self.arg2[i]) + ', R' + str(self.arg3[i]) + '\n\n')
+ 
+                #action, if rt == 0, then rd = rs
+                if (self.R[self.arg3[i]] == 0):
+                    self.R[self.arg1[i]] = self.R[self.arg2[i]]
 
+                self.writeRegs( sfile )
+                self.writeData( sfile )
+                sfile.write('\n====================\n')
+                self.cycle += 1
+                self.PC += 4
+                
+            elif self.instruction[i] == 'MUL':
+                sfile.write('cycle:' + str(self.cycle) + '\t' + str(self.address[i]))
+                sfile.write('\t' + self.instruction[i] + '\tR'+ str(self.arg1[i]) + ', R')
+                sfile.write( str(self.arg2[i]) + ', R' + str(self.arg3[i]) + '\n\n')
+ 
+                #action
+                self.R[self.arg1[i]] = self.R[self.arg2[i]] * self.R[self.arg3[i]]
+
+                self.writeRegs( sfile )
+                self.writeData( sfile )
+                sfile.write('\n====================\n')
+                self.cycle += 1
+                self.PC += 4
+                
+            elif self.instruction[i] == 'AND':
+                sfile.write('cycle:' + str(self.cycle) + '\t' + str(self.address[i]))
+                sfile.write('\t' + self.instruction[i] + '\tR'+ str(self.arg1[i]) + ', R')
+                sfile.write( str(self.arg2[i]) + ', R' + str(self.arg3[i]) + '\n\n')
+ 
+                #action
+                self.R[self.arg1[i]] = self.R[self.arg2[i]] & self.R[self.arg3[i]]
+
+                self.writeRegs( sfile )
+                self.writeData( sfile )
+                sfile.write('\n====================\n')
+                self.cycle += 1
+                self.PC += 4
+                
+            elif self.instruction[i] == 'OR':
+                sfile.write('cycle:' + str(self.cycle) + '\t' + str(self.address[i]))
+                sfile.write('\t' + self.instruction[i] + '\tR'+ str(self.arg1[i]) + ', R')
+                sfile.write( str(self.arg2[i]) + ', R' + str(self.arg3[i]) + '\n\n')
+ 
+
+                #action
+                self.R[self.arg1[i]] = self.R[self.arg2[i]] | self.R[self.arg3[i]]
+
+                self.writeRegs( sfile )
+                self.writeData( sfile )
+                sfile.write('\n====================\n')
+                self.cycle += 1
+                self.PC += 4
+ 
+            
     def writeRegs( self, sfile ):
         sfile.write('registers:\nr00:')
         for i in range(8):
