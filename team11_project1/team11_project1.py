@@ -469,7 +469,6 @@ class state:
                 sfile.write('\n====================\n')
                 self.cycle += 1
                 self.PC += 4
- 
             
     def writeRegs( self, sfile ):
         sfile.write('registers:\nr00:')
@@ -488,17 +487,11 @@ class state:
 
     def writeData( self, sfile ):
         startmemory = ( (self.numInstructions) * 4 + 96)
-        sfile.write('\ndata:\n' + str(startmemory) + ':')
-        for i in range(8):
-            sfile.write('\t' + str(self.memory[i]) )
-        startmemory += 32
-        sfile.write('\n' + str(startmemory) + ':')
-        for i in range(8,16):
-            sfile.write('\t' + str(self.memory[i]) )
-        startmemory += 32
-        sfile.write('\n' + str(startmemory) + ':')
-        for i in range(16,24):
-            sfile.write('\t' + str(self.memory[i]) )
+        sfile.write('\ndata:')
+        for i in range(len(self.memory)/8):
+            sfile.write('\n' + str(startmemory + (32 * i)) + ':' )   
+            for j in range(8):
+                sfile.write('\t' + str(self.memory[i*8 + j]) )
         sfile.write('\n')
 
 def main(argv):
